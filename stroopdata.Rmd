@@ -1,0 +1,155 @@
+---
+title: "Stroop Effect"
+author: "Abir Pattnaik"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Stroop Effect
+
+## Introduction
+
+Stroop's innovation was to show, clearly and definitively, that our embedded knowledge about our environment impacts how we interact with it. His research method is now one of the most famous and well-known examples of a psychological test, and is elegant in its simplicity.
+
+First, the participant reads a list of words for colors, but the words are printed in a color different to the word itself. For example, the word "orange" would be listed as text, but printed in green. The participant's reading time of the words on the list is then recorded. Next, the participant has to repeat the test with a new list of words, but should name the colors that the words are printed in. So, when the word "orange" is printed in green, the participant should say "green" and move on to the next word.
+
+## Reasoning
+
+What this reveals is that the brain can't help but read. As habitual readers, we encounter and comprehend words on such a persistent basis that the reading occurs almost effortlessly, whereas declaration of a color requires more cognitive effort. When there is a conflict between these two sources of information, our cognitive load is increased, and our brains have to work harder to resolve the required difference. Performing these tasks (preventing reading, processing word color, and resolving information conflict) ultimately slows down our responses, and makes the task take longer.
+
+There are a few theories that slightly differ in their definitions of the Stroop Effect, yet their differences mostly lie in which part that they emphasize. For example, one theory emphasizes that the automaticity of reading as the principal cause of Stroop interference, while another emphasizes the mental prioritizing which we perform when reading, as compared to defining colors. While differences in theories may therefore exist, all essentially converge on the central premise that reading is a simpler and more automatic task than stating colors, and that a conflict between the two will increase the time needed for processing.
+
+More about [Stroop Effect](https://imotions.com/blog/the-stroop-effect/)
+
+## 1. What is our independent variable? What is our dependent variable?
+
+### Independent Variable
+
+An independent variable is the variable that is changed or controlled in a scientific experiment to test the effects on the dependent variable.For this experiment, the independent variable are the words that were provided to the subjects(congruent or incongruent).
+
+### Dependent Variable
+
+A dependent variable is the variable being tested and measured in a scientific experiment.The dependent variable is the time taken by the test subject to read both the congruent and incongruent words.
+
+## 2. What is an appropriate set of hypotheses for this task? What kind of statistical test do you expect to perform? Justify your choices.
+
+A statistical hypothesis is an assumption about a population parameter. This assumption may or may not be true. Hypothesis testing refers to the formal procedures used by statisticians to accept or reject statistical hypotheses.
+
+Statistical Hypotheses
+The best way to determine whether a statistical hypothesis is true would be to examine the entire population. Since that is often impractical, researchers typically examine a random sample from the population. If sample data are not consistent with the statistical hypothesis, the hypothesis is rejected.
+
+There are two types of statistical hypotheses.
+
+Null hypothesis. The null hypothesis, denoted by H0, is usually the hypothesis that sample observations result purely from chance. 
+
+Alternative hypothesis. The alternative hypothesis, denoted by H1 or Ha, is the hypothesis that sample observations are influenced by some non-random cause.
+[Source](http://stattrek.com/hypothesis-test/hypothesis-testing.aspx)
+
+For this situation on Stroop Effect,our **null hypothesis** is this-
+H~0~ There is no signicant difference in mean scores of congruent and       Incongruent
+$$\mu_i-\mu_c=0$$
+H~a~ There is a significant difference in mean scores of congruent and Inconguent
+
+$$\mu_i-\mu_c\neq0$$
+Source:
+[Latex in RMarkdown](http://www.statpower.net/Content/310/R%20Stuff/SampleMarkdown.html)
+[neq](https://tex.stackexchange.com/questions/63781/how-to-write-a-not-equal-to-sign-in-latex-pseudocode)
+
+Its quite important in finding the right statistical test to perform in this analysis.This [document](https://uq.edu.au/student-services/sites/default/files/Statistical-tests-table_0.pdf) gives an interesting methods on which method to choose for the statistical test.
+
+Since we are finding relationship between two continuos variable t-test is and excellent choice for this analysis.
+
+## 3. Report some descriptive statistics regarding this dataset. Include at least one measure of central tendency and at least one measure of variability.
+
+```{r Descriptive Statistics,echo=FALSE,warning=FALSE,message=FALSE}
+library(Hmisc)
+library(gridExtra)
+library(effsize)
+stroop_data<-stroop_data<-read.csv('C:/Users/DRDO HQ/Desktop/UDACITY NANODEGREE/P5 Inferential Statistics/stroopdata.csv')
+# Checking if data is loaded correctly
+View(head(stroop_data))
+describe(stroop_data)
+```
+
+The mean and median are as follows:-
+
+Central Tendency  | Congruent   | Incongruent
+------------------|-------------|------------
+Mean              | 14.05       | 22.02
+Median(50%)       | 14.357      | 21.02
+
+
+Measures of variability 
+
+Variability       | Congruent   |Incongruent
+------------------|-------------|------------
+Standard Deviation| 3.56        |4.78
+
+
+```{r Standard Deviation ,message=FALSE,warning=FALSE}
+IQR_sd<-function(x){
+  print ('Standard Deviation of the variable')
+  print (sd(x))
+  print ('IQR of the variable')
+  print (IQR(x))
+}
+
+IQR_sd(stroop_data$Congruent)
+IQR_sd(stroop_data$Incongruent)
+```
+
+## 4. Provide one or two visualizations that show the distribution of the sample data. Write one or two sentences noting what you observe about the plot or plots.
+
+```{r Plotting,echo=FALSE,message=FALSE,warning=FALSE}
+c1<-cut(stroop_data$Congruent,breaks=seq(8,23,by=3))
+c1_bar<-barchart(c1,xlab='Count',ylab='Congruent')
+c2<-cut(stroop_data$Incongruent,breaks=seq(15,36,by=5))
+c2_bar<-barchart(c2,xlab='Count',ylab='Incongruent')
+grid.arrange(c1_bar,c2_bar, ncol =2)
+```
+
+A barchart was made between scores and data.These show that data collected depicts that most of them completed their scores in the 14-17 sec for congruent range and it took most of the subjects 20-25 sec for Incongruent range.This shows that incongruent words did took a longer time than the rest of them.
+
+```{r Hist,echo=FALSE,warning=FALSE,message=FALSE}
+stroop_data$Difference<-stroop_data$Incongruent-stroop_data$Congruent
+hist(stroop_data$Difference,freq=FALSE,xlab='Difference between the two scores',main='Histogram for difference between Congruent and Incongruent scores',col='gold')
+lines(density(stroop_data$Difference), col = "red", lwd = 2)
+```
+
+This shows the difference between Incongruent scores and Congruent scores.
+$$Difference=Incongruent-Congruent$$
+
+There is a difference of 5-10 seconds as it reaches its highest peak.
+
+## 5. Now, perform the statistical test and report your results. What is your confidence level and your critical statistic value? Do you reject the null hypothesis or fail to reject it? Come to a conclusion in terms of the experiment task. Did the results match up with your expectations?
+
+t.test function takes in the two variables i.e. COngruent and Incongruent scores.We took paired=TRUE because this is dependent on each other as the subject was first watched the congruent words and then the same subject watched the incongruent words.
+
+```{r T test, warning=FALSE,message=FALSE}
+t.test(x=stroop_data$Congruent,y=stroop_data$Incongruent,paired = TRUE,alternative = "two.sided")
+cohen.d(stroop_data$Congruent,stroop_data$Incongruent,paired=TRUE)
+```
+
+Here are the **results**:
+1. t-statistic- -8.02
+
+2. degrees of freedom=23
+
+3. p-value=less than 0.0001
+![alt text][id]
+
+4.Confidence Interval =95%
+
+5.alpha value=0.05
+
+6.Cohens d value= -1.64
+
+t-value falls into left tail critical region and thus rejects the null hypothesis i.e. The difference of congruent and incongruent scores is equal to 0.
+
+This thus establishes the stroop effect.
+
+
+[id]: C:/Users/DRDO HQ/Desktop/UDACITY NANODEGREE/P5 Inferential Statistics/graphpad.png "Evaluation using graph pad"
